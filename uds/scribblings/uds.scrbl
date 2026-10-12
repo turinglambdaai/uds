@@ -142,7 +142,6 @@ Typed builders for the session-management services.
 @defproc[(report-supported-dtc [#:suppress? suppress? boolean? #f]) bytes?]{
 ReadDTCInformation builders for the three most used sub-functions.
 }}}
-}
 
 @defproc[(security-access-request-seed [level (integer-in 0 63)]) bytes?]{
 @defproc[(security-access-send-key [level (integer-in 0 63)] [key bytes?]) bytes?]{
@@ -156,7 +155,6 @@ following even level sends the key; the builders enforce the parity.
 @defproc[(input-output-control-by-identifier [did (integer-in 0 65535)] [data bytes?]) bytes?]{
 Data-identifier services; DIDs are 16-bit big-endian.
 }}}
-}
 
 @defproc[(routine-control [action (or/c 'start 'stop 'request-results (integer-in 0 127))]
                           [routine-id (integer-in 0 65535)]
