@@ -47,6 +47,45 @@ The @racket[sid:*] bindings name every ISO 14229-1 service
 @racket[service-uses-sub-function?] tells whether the service's second byte
 is a sub-function — the distinction that drives generic framing.
 
+The full service-identifier table, as exported constants:
+
+@defthing[sid:diagnostic-session-control (integer-in 0 255)]{}
+@defthing[sid:ecu-reset (integer-in 0 255)]{}
+@defthing[sid:clear-diagnostic-information (integer-in 0 255)]{}
+@defthing[sid:read-dtc-information (integer-in 0 255)]{}
+@defthing[sid:read-data-by-identifier (integer-in 0 255)]{}
+@defthing[sid:read-memory-by-address (integer-in 0 255)]{}
+@defthing[sid:read-scaling-data-by-identifier (integer-in 0 255)]{}
+@defthing[sid:security-access (integer-in 0 255)]{}
+@defthing[sid:authentication (integer-in 0 255)]{}
+@defthing[sid:communication-control (integer-in 0 255)]{}
+@defthing[sid:read-data-by-periodic-identifier (integer-in 0 255)]{}
+@defthing[sid:dynamically-define-data-identifier (integer-in 0 255)]{}
+@defthing[sid:define-data-by-identifier (integer-in 0 255)]{}
+@defthing[sid:write-data-by-identifier (integer-in 0 255)]{}
+@defthing[sid:input-output-control-by-identifier (integer-in 0 255)]{}
+@defthing[sid:routine-control (integer-in 0 255)]{}
+@defthing[sid:request-download (integer-in 0 255)]{}
+@defthing[sid:request-upload (integer-in 0 255)]{}
+@defthing[sid:transfer-data (integer-in 0 255)]{}
+@defthing[sid:request-transfer-exit (integer-in 0 255)]{}
+@defthing[sid:request-file-transfer (integer-in 0 255)]{}
+@defthing[sid:write-memory-by-address (integer-in 0 255)]{}
+@defthing[sid:tester-present (integer-in 0 255)]{}
+@defthing[sid:access-timing-parameter (integer-in 0 255)]{}
+@defthing[sid:secured-data-transmission (integer-in 0 255)]{}
+@defthing[sid:control-dtc-setting (integer-in 0 255)]{}
+@defthing[sid:response-on-event (integer-in 0 255)]{}
+@defthing[sid:link-control (integer-in 0 255)]{}
+
+@defproc[(service-name [sid (integer-in 0 255)]) (or/c symbol? #f)]{
+ The ISO name of the service as a symbol (e.g. @racket['read-data-by-identifier]),
+ or @racket[#f] for codes outside the table.}
+
+@defproc[(service-uses-sub-function? [sid (integer-in 0 255)]) boolean?]{
+ Does this service carry a sub-function byte?  The distinction that drives
+ the generic framing in @racket[make-request] and @racket[request-parse].}
+
 @defproc[(positive-sid [sid (integer-in 0 255)]) (integer-in 0 255)]{
 The positive-response marker: @racket[sid] | @racket[#x40].
 }
@@ -78,6 +117,75 @@ The parsed negative response.  @racket[negative-response-parse] and
 tester to keep waiting.
 }
 
+@defproc[(negative-response-parse [payload bytes?]) negative-response?]{
+ Parses a @tt{7F <SID> <NRC>} payload; raises on anything else.}
+
+@defproc[(negative-response-bytes [sid (integer-in 0 255)] [nrc (integer-in 0 255)]) bytes?]{
+ Builds the negative-response payload.}
+
+@defproc[(nrc-name [nrc (integer-in 0 255)]) (or/c symbol? #f)]{
+ The ISO name of the negative response code as a symbol (SDF naming:
+ @racket['requestOutOfRange], @racket['securityAccessDenied], ...), or
+ @racket[#f] when the code is not in the table.}
+
+@defproc[(response-pending? [payload bytes?]) boolean?]{
+ Recognizes the @tt{requestCorrectlyReceived-ResponsePending} negative
+ response (NRC 0x78) that tells the tester to keep waiting.}
+
+The exported NRC constants:
+
+@defthing[nrc:general-reject (integer-in 0 255)]{}
+@defthing[nrc:service-not-supported (integer-in 0 255)]{}
+@defthing[nrc:sub-function-not-supported (integer-in 0 255)]{}
+@defthing[nrc:incorrect-message-length-or-invalid-format (integer-in 0 255)]{}
+@defthing[nrc:response-too-long (integer-in 0 255)]{}
+@defthing[nrc:busy-repeat-request (integer-in 0 255)]{}
+@defthing[nrc:conditions-not-correct (integer-in 0 255)]{}
+@defthing[nrc:request-sequence-error (integer-in 0 255)]{}
+@defthing[nrc:no-response-from-subnet-component (integer-in 0 255)]{}
+@defthing[nrc:failure-prevents-execution-of-requested-action (integer-in 0 255)]{}
+@defthing[nrc:request-out-of-range (integer-in 0 255)]{}
+@defthing[nrc:security-access-denied (integer-in 0 255)]{}
+@defthing[nrc:authentication-required (integer-in 0 255)]{}
+@defthing[nrc:invalid-key (integer-in 0 255)]{}
+@defthing[nrc:exceed-number-of-attempts (integer-in 0 255)]{}
+@defthing[nrc:required-time-delay-not-expired (integer-in 0 255)]{}
+@defthing[nrc:secure-data-transmission-required (integer-in 0 255)]{}
+@defthing[nrc:secure-data-transmission-not-allowed (integer-in 0 255)]{}
+@defthing[nrc:secure-data-verification-failed (integer-in 0 255)]{}
+@defthing[nrc:ownership-verification-failed (integer-in 0 255)]{}
+@defthing[nrc:challenge-calculation-failed (integer-in 0 255)]{}
+@defthing[nrc:setting-access-rights-failed (integer-in 0 255)]{}
+@defthing[nrc:session-key-creation-derivation-failed (integer-in 0 255)]{}
+@defthing[nrc:configuration-data-usage-failed (integer-in 0 255)]{}
+@defthing[nrc:de-authentication-failed (integer-in 0 255)]{}
+@defthing[nrc:upload-download-not-accepted (integer-in 0 255)]{}
+@defthing[nrc:transfer-data-suspended (integer-in 0 255)]{}
+@defthing[nrc:general-programming-failure (integer-in 0 255)]{}
+@defthing[nrc:wrong-block-sequence-counter (integer-in 0 255)]{}
+@defthing[nrc:request-correctly-received-response-pending (integer-in 0 255)]{}
+@defthing[nrc:sub-function-not-supported-in-active-session (integer-in 0 255)]{}
+@defthing[nrc:service-not-supported-in-active-session (integer-in 0 255)]{}
+@defthing[nrc:rpm-too-high (integer-in 0 255)]{}
+@defthing[nrc:rpm-too-low (integer-in 0 255)]{}
+@defthing[nrc:engine-is-running (integer-in 0 255)]{}
+@defthing[nrc:engine-is-not-running (integer-in 0 255)]{}
+@defthing[nrc:engine-run-time-too-low (integer-in 0 255)]{}
+@defthing[nrc:temperature-too-high (integer-in 0 255)]{}
+@defthing[nrc:temperature-too-low (integer-in 0 255)]{}
+@defthing[nrc:vehicle-speed-too-high (integer-in 0 255)]{}
+@defthing[nrc:vehicle-speed-too-low (integer-in 0 255)]{}
+@defthing[nrc:throttle-pedal-too-high (integer-in 0 255)]{}
+@defthing[nrc:throttle-pedal-too-low (integer-in 0 255)]{}
+@defthing[nrc:transmission-range-not-in-neutral (integer-in 0 255)]{}
+@defthing[nrc:transmission-range-not-in-gear (integer-in 0 255)]{}
+@defthing[nrc:brake-switch-not-closed (integer-in 0 255)]{}
+@defthing[nrc:shifter-lever-not-in-park (integer-in 0 255)]{}
+@defthing[nrc:torque-converter-clutch-locked (integer-in 0 255)]{}
+@defthing[nrc:voltage-too-high (integer-in 0 255)]{}
+@defthing[nrc:voltage-too-low (integer-in 0 255)]{}
+@defthing[nrc:resource-temporarily-not-available (integer-in 0 255)]{}
+
 @section{Diagnostic trouble codes}
 
 @defstruct*[dtc ((number (integer-in 0 65535))
@@ -104,6 +212,37 @@ The status byte (ISO 14229-1 Annex D) as flags; @racket[make-dtc-status],
 ClearDiagnosticInformation.
 }
 
+@defproc[(dtc-text->number [s string?]) (integer-in 0 65535)]{
+ Parses the three-letter text form (@tt{"P0123"}) into the 16-bit number.}
+
+@defproc[(dtc-number->text [n (integer-in 0 65535)]) string?]{
+ Renders the 16-bit number as the three-letter text form.}
+
+@defproc[(parse-dtc-records [payload bytes?]) (listof dtc?)]{
+ Reads the run of 3-byte @tt{[number_hi number_lo status]} records that
+ ReadDTCInformation responses carry.}
+
+@defproc[(make-dtc-status
+          [#:test-failed test-failed boolean? #f]
+          [#:test-failed-this-operation-cycle test-failed-this-operation-cycle boolean? #f]
+          [#:pending pending boolean? #f]
+          [#:confirmed confirmed boolean? #f]
+          [#:test-not-completed-since-last-clear test-not-completed-since-last-clear boolean? #f]
+          [#:test-failed-since-last-clear test-failed-since-last-clear boolean? #f]
+          [#:test-not-completed-this-operation-cycle test-not-completed-this-operation-cycle boolean? #f]
+          [#:warning-indicator-requested warning-indicator-requested boolean? #f])
+         dtc-status?]{
+ Builds a status byte by keyword; unset flags default to @racket[#f].}
+
+@defproc[(dtc-status->byte [s dtc-status?]) (integer-in 0 255)]{
+ Packs the flags into the wire byte.}
+
+@defproc[(byte->dtc-status [b (integer-in 0 255)]) dtc-status?]{
+ Unpacks the wire byte into flags.}
+
+@defthing[+dtc-group-all+ (integer-in 0 16777215)]{
+ The 0xFFFFFF ``all DTCs'' group for @racket[clear-diagnostic-information].}
+
 @section{Requests}
 
 @defstruct*[request ([sid (integer-in 0 255)]
@@ -113,6 +252,10 @@ ClearDiagnosticInformation.
 A parsed request: @racket[request-parse] decodes any payload, resolving the
 sub-function/suppress-bit split for sub-function services.
 }
+
+@defproc[(request-parse [payload bytes?]) request?]{
+ Decodes any request payload, resolving the sub-function/suppress-bit
+ split for sub-function services.}
 
 @defproc[(make-request [sid (integer-in 0 255)]
                        [#:sub-function sub (or/c #f (integer-in 0 127)) #f]
@@ -174,6 +317,16 @@ Memory and transfer services.  The
 @tt{addressAndLengthFormatIdentifier} (high nibble: address byte count, low
 nibble: size byte count) is built by @racket[encode-address-and-length] and
 read back by @racket[decode-address-and-length].
+
+@defproc[(encode-address-and-length [address integer?] [address-bytes (integer-in 1 15)]
+                                    [size integer?] [size-bytes (integer-in 1 15)]) bytes?]{
+ Builds the @tt{addressAndLengthFormatIdentifier} followed by the big-endian
+ address and size.}
+
+@defproc[(decode-address-and-length [payload bytes?])
+         (values integer? integer?)]{
+ Inverse of @racket[encode-address-and-length]: returns the address and
+ the size.}
 }}}}
 }
 
@@ -193,17 +346,34 @@ services) and the response record.
 A parsed positive response; @racket[sid] is the request service ID.
 }
 
-Record decoders for the common positive responses:
+Record decoders for the common positive responses.  Each takes the
+@racket[positive-response]-data byte string and returns the decoded
+fields; length mismatches raise.
 
-@itemlist[
- @item{@racket[session-control-response] — session type, P2 (ms) and P2*
-  (ms; wire value × 10).}
- @item{@racket[security-seed-response] — the seed bytes.}
- @item{@racket[max-block-length-response] — maxNumberOfBlockLength.}
- @item{@racket[number-of-dtc-response] — format identifier and DTC count.}
- @item{@racket[dtc-list-response] — the DTC records as @racket[dtc?] values.}
- @item{@racket[transfer-data-response] — echoed block counter and record.}
-]
+@defproc[(session-control-response [data bytes?])
+         (values (integer-in 0 255) exact-nonnegative-integer? exact-nonnegative-integer?)]{
+ DiagnosticSessionControl: session type, P2 in milliseconds, P2* in
+ milliseconds (the wire value counts units of 10 ms).}
+
+@defproc[(security-seed-response [data bytes?]) bytes?]{
+ SecurityAccess @tt{requestSeed}: the seed bytes.}
+
+@defproc[(max-block-length-response [data bytes?]) exact-nonnegative-integer?]{
+ RequestDownload/RequestUpload: @tt{maxNumberOfBlockLength}.}
+
+@defproc[(number-of-dtc-response [data bytes?])
+         (values (integer-in 0 255) exact-nonnegative-integer?)]{
+ ReadDTCInformation @tt{reportNumberOfDTCByStatusMask}: DTC format
+ identifier and the 24-bit DTC count.}
+
+@defproc[(dtc-list-response [data bytes?]) (listof dtc?)]{
+ ReadDTCInformation @tt{reportDTCByStatusMask} /
+ @tt{reportSupportedDTC}: the DTC records as @racket[dtc?] values.}
+
+@defproc[(transfer-data-response [data bytes?])
+         (values (integer-in 0 255) bytes?)]{
+ TransferData: the echoed block sequence counter and the response
+ record.}
 
 @section{Caveats}
 
