@@ -12,5 +12,7 @@
 (define pkg-desc "Pure-Racket ISO 14229 (Unified Diagnostic Services): service IDs, NRCs, DTCs, request builders and response parsers, transport-agnostic")
 (define pkg-authors '("turinglambdaai"))
 (define license 'MIT)
-;; Loading the scribblings as a "test" produces no tests and noise; skip it.
+;; Collection-level scribblings declaration: for multi packages the
+;; catalog doc build reads only this file, so the manual entry lives here.
+(define scribblings '(["uds/scribblings/uds.scrbl" ()]))
 (define test-omit-paths '("uds/scribblings"))
