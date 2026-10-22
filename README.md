@@ -1,5 +1,7 @@
 # uds — ISO 14229 (Unified Diagnostic Services) in pure Racket
 
+**English** · [中文](README.zh-CN.md)
+
 [![CI](https://github.com/turinglambdaai/uds/actions/workflows/ci.yml/badge.svg)](https://github.com/turinglambdaai/uds/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 `uds` implements the message layer of **ISO 14229-1** — **UDS**
