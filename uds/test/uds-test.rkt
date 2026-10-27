@@ -266,7 +266,18 @@
   (check-equal? session 3)
   (check-equal? p2 50)                 ; 0x0032 ms
   (check-equal? p2-star 2000)          ; 0x00C8 * 10 ms
-  (check-exn exn:fail? (lambda () (session-control-response (bytes #x03 #x00)))))
+  (check-exn exn:fail? (lambda () (session-control-response (bytes #x03 #x00))))
+  ;; Previously a four-byte response passed the length check and failed at
+  ;; subbytes, leaking an internal bounds error instead of a clear diagnostic.
+  (check-exn #rx"need session byte plus 4 timing bytes"
+             (lambda () (session-control-response (bytes #x03 #x00 #x32 #x00))))
+  ;; Parse and compose the response exactly as clients receive it.
+  (define parsed (response-parse (bytes #x50 #x03 #x00 #x32 #x00 #xC8)))
+  (define record
+    (bytes-append (bytes (positive-response-sub-function parsed))
+                  (positive-response-data parsed)))
+  (define-values (s p2-ms p2-star-ms) (session-control-response record))
+  (check-equal? (list s p2-ms p2-star-ms) (list 3 50 2000)))
 
 (test-case "security seed response"
   (check-equal? (security-seed-response (bytes #x04 #xDE #xAD #xBE #xEF))
