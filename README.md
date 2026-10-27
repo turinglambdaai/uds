@@ -26,6 +26,7 @@ raco pkg install uds
 ## Usage
 
 ```racket
+#lang racket/base
 (require uds)
 
 ;; Ask for the extended diagnostic session
@@ -40,7 +41,11 @@ raco pkg install uds
 ;; Parse whatever comes back
 (define r (response-parse #"\120\3\000\062\000\310"))
 ;; => positive response of DiagnosticSessionControl, sub 3
-(session-control-response (positive-response-data r))  ; => 3, 50, 2000
+;; response-parse stores the echoed session separately from P2/P2*.
+(define record (bytes-append (bytes (positive-response-sub-function r))
+                             (positive-response-data r)))
+(define-values (session p2-ms p2-star-ms) (session-control-response record))
+(list session p2-ms p2-star-ms)  ; => '(3 50 2000)
 
 ;; Negative responses
 (response-parse #"\177\42\61")  ; => (negative-response #x22 #x31)
@@ -67,6 +72,30 @@ Diagnostic trouble codes:
 - Every numeric constant was cross-checked against the public
   [python-udsoncan](https://github.com/pylessard/python-udsoncan)
   implementation (MIT); the test suite pins those values as golden vectors.
+
+## API documentation and development
+
+The [Scribble API reference](uds/scribblings/uds.scrbl) specifies request and
+response records, DTCs and error conditions. In particular,
+`session-control-response` accepts a **five-byte record**: the echoed session
+sub-function plus four timing bytes. `response-parse` stores that echoed
+sub-function separately; use the exact combination shown above.
+
+A [standalone verified quickstart](examples/quickstart.rkt) exercises
+synthetic session requests, VIN DID requests, positive/negative response
+parsing, timing units and DTCs; no CAN adapter, ECU or network is required.
+
+From a local repository checkout (Racket installed):
+
+```sh
+raco pkg install --auto --link "$(pwd)"
+raco test -p uds
+racket examples/quickstart.rkt
+raco setup --check-pkg-deps -l uds
+```
+
+CI runs these checks on Linux, Windows and macOS. This package implements only
+the UDS message layer; transport/timeout/security are the caller's responsibility.
 
 ## Limitations
 
