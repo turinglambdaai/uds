@@ -35,7 +35,12 @@ FFI and no system dependency.
 
 ;; A response arrives as ISO-TP payload bytes:
 (response-parse #"\120\3\000\062\000\310")      ; => positive 0x50, sub 3
-(session-control-response (positive-response-data (response-parse #"\120\3\000\062\000\310")))
+(define parsed (response-parse #"\\120\\3\\000\\062\\000\\310"))
+(define record
+  (bytes-append (bytes (positive-response-sub-function parsed))
+                (positive-response-data parsed)))
+(define-values (session p2-ms p2-star-ms) (session-control-response record))
+(list session p2-ms p2-star-ms)
 ;; => 3, 50, 2000   (session, P2 ms, P2* ms)
 ]
 
@@ -346,14 +351,22 @@ services) and the response record.
 A parsed positive response; @racket[sid] is the request service ID.
 }
 
-Record decoders for the common positive responses.  Each takes the
-@racket[positive-response]-data byte string and returns the decoded
-fields; length mismatches raise.
+Record decoders for common positive responses. Most take the
+@racket[positive-response]-data byte string; for services with echoed
+sub-functions, @racket[session-control-response] and
+@racket[security-seed-response] expect the sub-function byte prepended to
+that data (the parsed structure stores it separately).
+Length mismatches raise an exception.
 
 @defproc[(session-control-response [data bytes?])
          (values (integer-in 0 255) exact-nonnegative-integer? exact-nonnegative-integer?)]{
- DiagnosticSessionControl: session type, P2 in milliseconds, P2* in
- milliseconds (the wire value counts units of 10 ms).}
+ DiagnosticSessionControl: input must contain the echoed session
+ sub-function byte followed by P2 (two bytes) and P2* (two bytes).
+ The parser stores the echoed sub-function in
+ @racket[positive-response-sub-function] separately from
+ @racket[positive-response-data]. The returned three values are session
+ type, P2 milliseconds and P2* milliseconds (wire P2* units are 10 ms).
+ A record shorter than five bytes raises an exception.}
 
 @defproc[(security-seed-response [data bytes?]) bytes?]{
  SecurityAccess @tt{requestSeed}: the seed bytes.}
