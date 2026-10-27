@@ -48,11 +48,14 @@
     [else
      (error 'response-parse "not a UDS response: byte 0 is #x~x" (bytes-ref payload 0))]))
 
-;; DiagnosticSessionControl positive response record: P2 server max time
-;; (2 bytes, ms) then P2* (2 bytes, units of 10 ms).
+;; DiagnosticSessionControl response record including the echoed session
+;; sub-function byte (1 byte), P2 (2 bytes, ms), and P2* (2 bytes, units
+;; of 10 ms). response-parse separates that first byte into sub-function;
+;; callers must prepend it to positive-response-data before using this helper.
 (define (session-control-response data)
-  (unless (>= (bytes-length data) 4)
-    (error 'session-control-response "need 4 timing bytes, got ~a" (bytes-length data)))
+  (unless (>= (bytes-length data) 5)
+    (error 'session-control-response
+           "need session byte plus 4 timing bytes, got ~a" (bytes-length data)))
   (values (bytes-ref data 0)
           (bytes->uint (subbytes data 1 3))       ; P2, milliseconds
           (* 10 (bytes->uint (subbytes data 3 5))))) ; P2*, units of 10 ms
