@@ -35,7 +35,7 @@ FFI and no system dependency.
 
 ;; A response arrives as ISO-TP payload bytes:
 (response-parse #"\120\3\000\062\000\310")      ; => positive 0x50, sub 3
-(define parsed (response-parse #"\\120\\3\\000\\062\\000\\310"))
+(define parsed (response-parse (bytes #x50 #x03 #x00 #x32 #x00 #xC8)))
 (define record
   (bytes-append (bytes (positive-response-sub-function parsed))
                 (positive-response-data parsed)))
