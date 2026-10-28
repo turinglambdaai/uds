@@ -17,6 +17,7 @@ raco pkg install uds
 ## 用法
 
 ```racket
+#lang racket/base
 (require uds)
 
 ;; Ask for the extended diagnostic session
@@ -31,7 +32,11 @@ raco pkg install uds
 ;; Parse whatever comes back
 (define r (response-parse #"\120\3\000\062\000\310"))
 ;; => positive response of DiagnosticSessionControl, sub 3
-(session-control-response (positive-response-data r))  ; => 3, 50, 2000
+;; response-parse stores the echoed session separately from P2/P2*.
+(define record (bytes-append (bytes (positive-response-sub-function r))
+                             (positive-response-data r)))
+(define-values (session p2-ms p2-star-ms) (session-control-response record))
+(list session p2-ms p2-star-ms)  ; => '(3 50 2000)
 
 ;; Negative responses
 (response-parse #"\177\42\61")  ; => (negative-response #x22 #x31)
@@ -53,6 +58,28 @@ raco pkg install uds
 - 请求子功能字节的 bit 7 是 `suppressPosRspMsgIndicationBit`；`parse-sub-function-byte` 负责把它拆分出来。
 - DTC 编号：bit 15–14 为系统字母（P=00、C=01、B=10、U=11），bit 13–12 为第一位数字，其后是三个 BCD 半字节。"P0420" → 0x0420。
 - 全部数值常量都与公开的 [python-udsoncan](https://github.com/pylessard/python-udsoncan) 实现（MIT）交叉核对过；测试套件把这些值固化为 golden 向量。
+
+## API 文档与开发验证
+
+[完整 Scribble API 手册](uds/scribblings/uds.scrbl)说明请求响应结构、
+DTC 及错误条件。`session-control-response` 需要**五字节记录**：
+一字节回显的会话子功能加四字节 P2/P2* 时间参数。
+`response-parse` 会把子功能字节分开存放，调用时必须按上面的代码组合。
+
+[可执行入门示例](examples/quickstart.rkt)使用合成数据验证会话请求、
+VIN DID、肯定/否定响应、时间单位和 DTC；不需要 CAN 适配器、ECU 或网络。
+
+在已安装 Racket 的仓库根目录执行：
+
+```sh
+raco pkg install --auto --link "$(pwd)"
+raco test -p uds
+racket examples/quickstart.rkt
+raco setup --check-pkg-deps -l uds
+```
+
+CI 在 Linux、Windows、macOS 上执行这些检查。本库只负责 UDS 消息层；
+传输、超时和安全算法由调用方负责。
 
 ## 局限
 
