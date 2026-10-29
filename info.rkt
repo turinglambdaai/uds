@@ -10,7 +10,7 @@
 (define deps '("base" "rackunit-lib"))
 (define build-deps '("base" "scribble-lib" "racket-doc" "rackunit-lib"))
 (define pkg-desc "Pure-Racket ISO 14229 (Unified Diagnostic Services): service IDs, NRCs, DTCs, request builders and response parsers, transport-agnostic")
-(define pkg-authors '("turinglambdaai"))
+(define pkg-authors '("turlamai"))
 (define license 'MIT)
 ;; Loading the scribblings as a "test" produces no tests and noise; skip it.
 (define test-omit-paths '("uds/scribblings"))

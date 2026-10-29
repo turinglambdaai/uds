@@ -2,7 +2,7 @@
 
 **English** · [中文](README.zh-CN.md)
 
-[![CI](https://github.com/turinglambdaai/uds/actions/workflows/ci.yml/badge.svg)](https://github.com/turinglambdaai/uds/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/turlamai/uds/actions/workflows/ci.yml/badge.svg)](https://github.com/turlamai/uds/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 `uds` implements the message layer of **ISO 14229-1** — **UDS**
 (Unified Diagnostic Services), the application protocol spoken by automotive
@@ -13,7 +13,7 @@ response messages.
 
 The library is transport-agnostic and pure: builders return the payload
 bytes of one ISO-TP message and parsers consume them. Pair it with the
-[`isotp`](https://github.com/turinglambdaai/isotp) package for the ISO
+[`isotp`](https://github.com/turlamai/isotp) package for the ISO
 15765-2 transport layer, or drive it over DoIP or a test double. There is no
 FFI and no system dependency.
 
