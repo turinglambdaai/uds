@@ -2,11 +2,11 @@
 
 [English](README.md) · **中文**
 
-[![CI](https://github.com/turinglambdaai/uds/actions/workflows/ci.yml/badge.svg)](https://github.com/turinglambdaai/uds/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/turlamai/uds/actions/workflows/ci.yml/badge.svg)](https://github.com/turlamai/uds/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 `uds` 以纯 Racket 实现 **ISO 14229-1** 的消息层——即汽车 ECU 所讲的应用层协议 **UDS**（Unified Diagnostic Services，统一诊断服务）：覆盖全部 27 个服务标识符、否定响应码、诊断故障码（16 位编号及其 P/C/B/U 文本形式、Annex-D 状态字节），以及请求与响应消息的类型化构造器/解析器。
 
-本库与传输层无关且纯净：构造器返回单条 ISO-TP 消息的载荷字节，解析器消费这些字节。可搭配 [`isotp`](https://github.com/turinglambdaai/isotp) 包提供 ISO 15765-2 传输层，也可以跑在 DoIP 或测试替身之上。无 FFI，无系统依赖。
+本库与传输层无关且纯净：构造器返回单条 ISO-TP 消息的载荷字节，解析器消费这些字节。可搭配 [`isotp`](https://github.com/turlamai/isotp) 包提供 ISO 15765-2 传输层，也可以跑在 DoIP 或测试替身之上。无 FFI，无系统依赖。
 
 ## 安装
 
